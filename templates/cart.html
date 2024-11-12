@@ -1,0 +1,106 @@
+{# cart.html #}
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4">Giỏ hàng của bạn</h2>
+    
+    {% if cart_items %}
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Sản phẩm</th>
+                        <th>Giá</th>
+                        <th>Số lượng</th>
+                        <th>Tổng</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in cart_items %}
+                    <tr id="cart-item-{{ item.id }}">
+                        <td>
+                            <img src="{{ url_for('static', filename='uploads/' + item.product.image_url) }}" alt="{{ item.product.name }}" style="width: 100px;">
+                            {{ item.product.name }}
+                        </td>
+                        <td>{{ "{:,.0f}".format(item.product.price) }}đ</td>
+                        <td style="width: 150px;">
+                            <div class="input-group">
+                                <input type="number" class="form-control quantity-input" 
+                                       value="{{ item.quantity }}" min="1" max="{{ item.product.stock }}"
+                                       data-item-id="{{ item.id }}">
+                            </div>
+                        </td>
+                        <td class="subtotal">{{ "{:,.0f}".format(item.product.price * item.quantity) }}đ</td>
+                        <td>
+                            <a href="{{ url_for('remove_from_cart', item_id=item.id) }}" 
+                               class="btn btn-sm btn-danger">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3" class="text-end"><strong>Tổng cộng:</strong></td>
+                        <td colspan="2" id="cart-total">
+                            <strong>{{ "{:,.0f}".format(total) }}đ</strong>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        
+        <div class="d-flex justify-content-end mt-3">
+            <a href="{{ url_for('index') }}" class="btn btn-secondary me-2">Tiếp tục mua sắm</a>
+            <a href="{{ url_for('checkout') }}" class="btn btn-primary">Thanh toán</a>
+        </div>
+    {% else %}
+        <div class="text-center py-5">
+            <h4>Giỏ hàng trống</h4>
+            <a href="{{ url_for('index') }}" class="btn btn-primary mt-3">Tiếp tục mua sắm</a>
+        </div>
+    {% endif %}
+</div>
+
+{% block scripts %}
+<script>
+document.querySelectorAll('.quantity-input').forEach(input => {
+    input.addEventListener('change', async function() {
+        const itemId = this.dataset.itemId;
+        const quantity = this.value;
+        
+        try {
+            const response = await fetch(`/cart/update/${itemId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `quantity=${quantity}`
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                // Update subtotal and total
+                const row = document.getElementById(`cart-item-${itemId}`);
+                row.querySelector('.subtotal').textContent = 
+                    new Intl.NumberFormat('vi-VN').format(data.subtotal) + 'đ';
+                document.getElementById('cart-total').textContent = 
+                    new Intl.NumberFormat('vi-VN').format(data.total) + 'đ';
+            } else {
+                alert(data.error);
+                // Reset quantity
+                this.value = this.defaultValue;
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Có lỗi xảy ra, vui lòng thử lại!');
+        }
+    });
+});
+</script>
+{% endblock %}
+{% endblock %}

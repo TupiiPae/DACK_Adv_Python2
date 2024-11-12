@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Quản lý{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-dark mb-4">Quản lý</h1>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-3 border-info">
+                <div class="card-body">
+                    <h5 class="card-title text-info">Số lượng người dùng</h5>
+                    <p class="card-text display-4">{{ total_users }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-3 border-success">
+                <div class="card-body">
+                    <h5 class="card-title text-success">Tổng đơn hàng</h5>
+                    <p class="card-text display-4">{{ total_orders }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-3 border-warning">
+                <div class="card-body">
+                    <h5 class="card-title text-warning">Tổng sản phẩm</h5>
+                    <p class="card-text display-4">{{ total_products }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="text-secondary mt-4">Đơn đặt gần đây</h2>
+    <ul class="list-group mb-4">
+        {% for order in recent_orders %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                Đơn #{{ order.id }} đặt bởi {{ order.user.username }}
+                <span class="badge badge-{{ 'success' if order.status == 'confirmed' else 'secondary' }} badge-pill">{{ order.status }}</span>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <h2 class="text-secondary">Sản phẩm sắp hết</h2>
+    <ul class="list-group">
+        {% for product in low_stock_products %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                {{ product.name }}
+                <span class="badge badge-danger badge-pill">Tồn kho: {{ product.stock }}</span>
+            </li>
+        {% endfor %}
+    </ul> 
+
+    <ul>
+    </ul>
+</div>
+{% endblock %}

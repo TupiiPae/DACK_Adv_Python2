@@ -1,0 +1,63 @@
+{# checkout.html #}
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4">Thanh toán</h2>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Thông tin giao hàng</h5>
+                    
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="address" class="form-label">Địa chỉ giao hàng</label>
+                            <textarea class="form-control" id="address" name="address" rows="3" required></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">Số điện thoại</label>
+                            <input type="tel" class="form-control" id="phone" name="phone" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="note" class="form-label">Ghi chú (không bắt buộc)</label>
+                            <textarea class="form-control" id="note" name="note" rows="2"></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Đặt hàng</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Đơn hàng của bạn</h5>
+                    
+                    {% for item in cart_items %}
+                    <div class="d-flex justify-content-between mb-2">
+                        <div>
+                            {{ item.product.name }} x {{ item.quantity }}
+                        </div>
+                        <div>
+                            {{ "{:,.0f}".format(item.product.price * item.quantity) }}đ
+                        </div>
+                    </div>
+                    {% endfor %}
+                    
+                    <hr>
+                    
+                    <div class="d-flex justify-content-between">
+                        <strong>Tổng cộng:</strong>
+                        <strong>{{ "{:,.0f}".format(total) }}đ</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
